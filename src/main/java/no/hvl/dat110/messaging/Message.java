@@ -2,6 +2,8 @@ package no.hvl.dat110.messaging;
 
 import no.hvl.dat110.TODO;
 
+import java.util.Arrays;
+
 public class Message {
 
 	// the up to 127 bytes of data (payload) that a message can hold
@@ -11,15 +13,21 @@ public class Message {
 	public Message(byte[] data) {
 		
 		// TODO - START
-		
-		if (true)
-			throw new UnsupportedOperationException(TODO.constructor("Message"));
-			
+		if (data == null) {
+			throw new IllegalArgumentException("Data kan ikke være null.");
+		}
+
+		if (data.length > 127) {
+			throw new IllegalArgumentException("Data kan ikke være lenger enn 127 bytes.");
+		}
+
+		this.data = Arrays.copyOf(data, data.length);
+
 		// TODO - END
 	}
 
 	public byte[] getData() {
-		return this.data; 
+		return Arrays.copyOf(this.data, this.data.length);
 	}
 
 }

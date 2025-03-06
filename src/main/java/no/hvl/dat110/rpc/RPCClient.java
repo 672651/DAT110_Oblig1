@@ -20,9 +20,11 @@ public class RPCClient {
 		
 		// TODO - START
 		// connect using the RPC client
-		
-		if (true)
-			throw new UnsupportedOperationException(TODO.method());
+
+		connection = msgclient.connect();
+		if (connection == null) {
+			throw new IllegalStateException("Failed to connect to the server.");
+		}
 		
 		// TODO - END
 	}
@@ -31,9 +33,11 @@ public class RPCClient {
 		
 		// TODO - START
 		// disconnect by closing the underlying messaging connection
-		
-		if (true)
-			throw new UnsupportedOperationException(TODO.method());
+
+		if (connection != null) {
+			connection.close();
+			connection = null;
+		}
 		
 		// TODO - END
 	}
@@ -47,8 +51,6 @@ public class RPCClient {
 
 	public byte[] call(byte rpcid, byte[] param) {
 		
-		byte[] returnval = null;
-		
 		// TODO - START
 
 		/*
@@ -58,12 +60,33 @@ public class RPCClient {
 		The return value from the RPC call must be decapsulated according to the RPC message format
 
 		*/
-				
-		if (true)
-			throw new UnsupportedOperationException(TODO.method());
+
+		if (connection == null) {
+			throw new IllegalStateException("Client is not connected to a server.");
+		}
+
+		byte[] request = new byte[param.length + 1];
+		request[0] = rpcid; // First byte is the RPC ID
+		System.arraycopy(param, 0, request, 1, param.length); // Copy parameters
+
+		connection.send(new Message(request));
+
+		Message response = connection.receive();
+		if (response == null) {
+			throw new IllegalStateException("No response received from server.");
+		}
+
+		byte[] responseData = response.getData();
+		if (responseData.length < 1) {
+			throw new IllegalStateException("Invalid response received.");
+		}
+
+		byte[] returnval = new byte[responseData.length - 1];
+		System.arraycopy(responseData, 1, returnval, 0, returnval.length);
+
+		return returnval;
 		
 		// TODO - END
-		return returnval;
 		
 	}
 

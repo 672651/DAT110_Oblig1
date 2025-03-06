@@ -34,33 +34,53 @@ public class MessageConnection {
 
 	public void send(Message message) {
 
-		byte[] data;
-		
 		// TODO - START
 		// encapsulate the data contained in the Message and write to the output stream
-		
-		if (true)
-			throw new UnsupportedOperationException(TODO.method());
-			
+
+		try {
+			byte[] data = message.getData();
+			int length = data.length;
+
+			if (length > 127) {
+				throw new IllegalArgumentException("Melding for lang (max 127 bytes)");
+			}
+
+			outStream.writeByte(length);
+			outStream.write(data);
+			outStream.flush();
+		} catch (IOException ex) {
+			System.out.println("Send error: " + ex.getMessage());
+			ex.printStackTrace();
+		}
+
 		// TODO - END
 
 	}
 
 	public Message receive() {
 
-		Message message = null;
-		byte[] data;
-		
 		// TODO - START
 		// read a segment from the input stream and decapsulate data into a Message
-		
-		if (true)
-			throw new UnsupportedOperationException(TODO.method());
+
+		try {
+			// Read the first byte to determine message length
+			int length = inStream.readByte();
+			if (length < 0 || length > 127) {
+				throw new IOException("Invalid message length received: " + length);
+			}
+
+			// Read the message data
+			byte[] data = new byte[length];
+			inStream.readFully(data); // Ensures we read exactly 'length' bytes
+
+			return new Message(data);
+		} catch (IOException ex) {
+			System.out.println("Receive error: " + ex.getMessage());
+			ex.printStackTrace();
+			return null;
+		}
 		
 		// TODO - END
-		
-		return message;
-		
 	}
 
 	// close the connection by closing streams and the underlying socket	

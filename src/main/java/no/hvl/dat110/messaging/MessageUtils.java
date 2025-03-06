@@ -12,36 +12,48 @@ public class MessageUtils {
 	public static String MESSAGINGHOST = "localhost";
 
 	public static byte[] encapsulate(Message message) {
-		
-		byte[] segment = null;
-		byte[] data;
-		
+
 		// TODO - START
 		
 		// encapulate/encode the payload data of the message and form a segment
 		// according to the segment format for the messaging layer
-		
-		if (true)
-			throw new UnsupportedOperationException(TODO.method());
+
+		byte[] data = message.getData();
+		int length = data.length;
+
+		if (length > 127) {
+			throw new IllegalArgumentException("Message data too long (max 127 bytes)");
+		}
+
+		byte[] segment = new byte[SEGMENTSIZE];
+
+		segment[0] = (byte) length;
+
+		System.arraycopy(data, 0, segment, 1, length);
+
+		return segment;
 			
 		// TODO - END
-		return segment;
 		
 	}
 
 	public static Message decapsulate(byte[] segment) {
-
-		Message message = null;
 		
 		// TODO - START
 		// decapsulate segment and put received payload data into a message
-		
-		if (true)
-			throw new UnsupportedOperationException(TODO.method());
+
+		int length = segment[0];
+
+		if (length < 0 || length > 127) {
+			throw new IllegalArgumentException("Invalid segment length: " + length);
+		}
+
+		byte[] data = new byte[length];
+		System.arraycopy(segment, 1, data, 0, length);
+
+		return new Message(data);
 		
 		// TODO - END
-		
-		return message;
 		
 	}
 	
